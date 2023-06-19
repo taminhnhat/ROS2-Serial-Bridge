@@ -45,6 +45,9 @@ def main(args=None):
     minimal_subscriber = MinimalSubscriber()
 
     rclpy.spin(minimal_subscriber)
+    while True:
+        serialString = serialPort.readLine()
+        print(serialString)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
