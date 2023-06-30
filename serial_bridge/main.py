@@ -35,7 +35,7 @@ class MinimalSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        cmd_msg = "{"+"\"topic\":\"base_control\",\"linear\":[{},{},{}],\"angular\":[{},{},{}]".format(msg.linear.x,msg.linear.y,msg.linear.z,msg.angular.x,msg.angular.y,msg.angular.z)+"}\r\n"
+        cmd_msg = "{"+"\"topic\":\"control\",\"linear\":[{},{},{}],\"angular\":[{},{},{}]".format(msg.linear.x,msg.linear.y,msg.linear.z,msg.angular.x,msg.angular.y,msg.angular.z)+"}\r\n"
         print(cmd_msg)
         serialPort.write(bytes(cmd_msg,'utf-8'))
 
