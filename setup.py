@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'serial = serial_bridge.main:main',
+            'plotter = serial_bridge.plotter:main',
         ],
     },
 )
