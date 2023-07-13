@@ -21,7 +21,7 @@ from geometry_msgs.msg import Twist
 import json
 
 import serial
-serialPort = serial.Serial('/dev/ttyUSB0',115200,timeout=1)
+serialPort = serial.Serial('/dev/agv-driver',115200,timeout=1)
 
 class MinimalSubscriber(Node):
 
