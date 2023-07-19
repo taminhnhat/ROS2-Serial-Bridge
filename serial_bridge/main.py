@@ -29,7 +29,8 @@ class MinimalSubscriber(Node):
         super().__init__('minimal_subscriber')
         self.subscription = self.create_subscription(
             Twist,
-            'diff_cont/cmd_vel_unstamped',
+            # 'diff_cont/cmd_vel_unstamped',
+            'cmd_vel_joy',
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
