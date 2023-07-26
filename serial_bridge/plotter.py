@@ -21,7 +21,7 @@ from geometry_msgs.msg import Twist
 import json
 
 import serial
-serialPort = serial.Serial('/dev/ttyUSB0',115200,timeout=1)
+serialPort = serial.Serial('/dev/ttyUSB1',115200,timeout=1)
 
 class MinimalSubscriber(Node):
 
@@ -35,7 +35,14 @@ class MinimalSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        cmd_msg = "{} {} {} {} {} {}".format(msg.linear.x,msg.linear.y,msg.linear.z,msg.angular.x,msg.angular.y,msg.angular.z)+"\r\n"
+        cmd_msg = "{x:.1f} {y:.1f} {z:.1f} {roll:.1f} {pitch:.1f} {yaw:.1f}".format(
+            x = msg.linear.x,
+            y = msg.linear.y,
+            z = msg.linear.z,
+            roll = msg.angular.x,
+            pitch = msg.angular.y,
+            yaw = msg.angular.z
+            )+"\r\n"
         print(cmd_msg)
         serialPort.write(bytes(cmd_msg,'utf-8'))
 

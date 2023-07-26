@@ -20,8 +20,10 @@ from geometry_msgs.msg import Twist
 
 import json
 
+import time
+
 import serial
-serialPort = serial.Serial('/dev/agv-driver',115200,timeout=1)
+serialPort = serial.Serial('/dev/ttyUSB0',115200,timeout=1)
 
 class MinimalSubscriber(Node):
 
@@ -29,16 +31,28 @@ class MinimalSubscriber(Node):
         super().__init__('minimal_subscriber')
         self.subscription = self.create_subscription(
             Twist,
-            # 'diff_cont/cmd_vel_unstamped',
-            'cmd_vel_joy',
+            'diff_cont/cmd_vel_unstamped',
+            # 'cmd_vel_joy',
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        cmd_msg = "{"+"\"topic\":\"control\",\"linear\":[{},{},{}],\"angular\":[{},{},{}]".format(msg.linear.x,msg.linear.y,msg.linear.z,msg.angular.x,msg.angular.y,msg.angular.z)+"}\r\n"
-        print(cmd_msg)
+        cmd_msg = "{"+"\"topic\":\"control\",\"linear\":[{x:.1f},{y:.1f},{z:.1f}],\"angular\":[{roll:.1f},{pitch:.1f},{yaw:.1f}],\"time\":{time:d}".format(
+            x = msg.linear.x,
+            y = msg.linear.y,
+            z = msg.linear.z,
+            roll = msg.angular.x,
+            pitch = msg.angular.y,
+            yaw = msg.angular.z,
+            time = round(time.time()*1000)
+            ) + "}\r\n"
+        yaw = msg.angular.z
+        # print(type(yaw))
+        if yaw>2:
+            print('ALERT !!!!!!!!!!!!!!!!!!!!!!!!!')
         serialPort.write(bytes(cmd_msg,'utf-8'))
+        print(cmd_msg)
 
 def main(args=None):
     rclpy.init(args=args)
