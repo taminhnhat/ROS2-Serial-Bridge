@@ -19,11 +19,19 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 
 import json
-
 import time
-
 import serial
-serialPort = serial.Serial('/dev/ttyUSB0',115200,timeout=1)
+import zlib
+
+serialPort = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+
+
+def milis():  # get miliseconds function
+    return round(time.time()*1000)
+
+
+last_call = milis()
+
 
 class MinimalSubscriber(Node):
 
@@ -38,21 +46,24 @@ class MinimalSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        cmd_msg = "{"+"\"topic\":\"control\",\"linear\":[{x:.1f},{y:.1f},{z:.1f}],\"angular\":[{roll:.1f},{pitch:.1f},{yaw:.1f}],\"time\":{time:d}".format(
-            x = msg.linear.x,
-            y = msg.linear.y,
-            z = msg.linear.z,
-            roll = msg.angular.x,
-            pitch = msg.angular.y,
-            yaw = msg.angular.z,
-            time = round(time.time()*1000)
-            ) + "}\r\n"
-        yaw = msg.angular.z
-        # print(type(yaw))
-        if yaw>2:
-            print('ALERT !!!!!!!!!!!!!!!!!!!!!!!!!')
-        serialPort.write(bytes(cmd_msg,'utf-8'))
-        print(cmd_msg)
+        global last_call
+        instant_call = milis()
+        if instant_call - last_call < 100:
+            return
+        last_call = instant_call
+        ctrl_msg = "{" + "\"topic\":\"control\",\"linear\":[{x:.1f},{y:.1f},{z:.1f}],\"angular\":[{roll:.1f},{pitch:.1f},{yaw:.1f}]".format(
+            x=msg.linear.x,
+            y=msg.linear.y,
+            z=msg.linear.z,
+            roll=msg.angular.x,
+            pitch=msg.angular.y,
+            yaw=msg.angular.z
+        ) + "}"
+        checksum = zlib.crc32(bytes(ctrl_msg, 'utf-8'))
+        cmd_msg = str(checksum) + ctrl_msg + "\r\n"
+        serialPort.write(bytes(cmd_msg, 'utf-8'))
+        print(str(round(time.time()*1000)) + "   " + cmd_msg)
+
 
 def main(args=None):
     rclpy.init(args=args)
