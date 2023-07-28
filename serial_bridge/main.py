@@ -48,8 +48,8 @@ class MinimalSubscriber(Node):
     def listener_callback(self, msg):
         global last_call
         instant_call = milis()
-        if instant_call - last_call < 100:
-            return
+        # if instant_call - last_call < 100:
+        #     return
         last_call = instant_call
         ctrl_msg = "{" + "\"topic\":\"control\",\"linear\":[{x:.1f},{y:.1f},{z:.1f}],\"angular\":[{roll:.1f},{pitch:.1f},{yaw:.1f}]".format(
             x=msg.linear.x,
